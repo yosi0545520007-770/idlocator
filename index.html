@@ -1,0 +1,201 @@
+
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <title>Id Locator</title>
+    <style>
+      body { font-family: 'Segoe UI', sans-serif; margin: 2rem; background: #f6f7fb; color: #222; }
+      h1 { margin-top: 0; }
+      form { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+      .info { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 1.5rem; line-height: 1.6; }
+      .info h2 { margin-top: 0; font-size: 1.1rem; }
+      .info ol { padding-right: 1.2rem; }
+      .info li { margin-bottom: 0.6rem; }
+      .info a { display: inline-block; margin-top: 0.8rem; color: #005cbb; text-decoration: none; font-weight: 600; }
+      .info a + a { margin-right: 1rem; }
+      .field { margin-bottom: 1rem; }
+      label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+      input[type="text"], input[type="file"] { width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #ccc; border-radius: 8px; }
+      button { background: #005cbb; color: #fff; border: none; padding: 0.7rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+      button.secondary { background: #666; }
+      .messages { margin-bottom: 1.5rem; }
+      .messages li { list-style: none; padding: 0.8rem 1rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 0.5rem; border-left: 5px solid #ccc; }
+      .messages .success { background: #e8f5e9; border-left-color: #4CAF50; }
+      .messages .error { background: #ffebee; border-left-color: #f44336; }
+      table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+      th, td { padding: 0.8rem 1rem; border-bottom: 1px solid #eee; text-align: right; }
+      th { background: #f0f2f7; font-weight: 600; }
+      tr:last-child td { border-bottom: none; }
+      #score-info-btn { background: #dbe4f0; color: #333; border: 1px solid #b0c4de; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-weight: bold; line-height: 1; padding: 0; }
+      .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+      .modal-content { background-color: #fff; margin: 10% auto; padding: 2rem; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; }
+      .close-btn { color: #aaa; position: absolute; left: 1.5rem; top: 1rem; font-size: 28px; font-weight: bold; cursor: pointer; }
+      .modal-content h2 { margin-top: 0; }
+      .modal-content ul { padding-right: 1.2rem; }
+      .modal-content li { margin-bottom: 0.5rem; }
+      .score-breakdown { background-color: #f9f9f9; font-size: 0.9em; color: #555; }
+      .score-breakdown td { padding-top: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #ddd; }
+      .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    </style>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('score-modal');
+        const btn = document.getElementById('score-info-btn');
+        const span = document.getElementsByClassName('close-btn')[0];
+
+        if (btn) btn.onclick = () => modal.style.display = 'block';
+        if (span) span.onclick = () => modal.style.display = 'none';
+        window.onclick = (event) => { if (event.target == modal) modal.style.display = 'none'; };
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Id Locator – איתור זהויות</h1>
+
+    <section class="info">
+      <p>מערכת לאיתור זהויות על בסיס נתונים. הזינו את פרטי החיפוש בטופס למטה ולחצו על "בצע חיפוש".</p>
+    </section>
+
+    <form method="post">
+      <h2>חיפוש מתקדם</h2>
+      <div class="field">
+        <label for="id_number">מספר תעודת זהות</label>
+        <input type="text" id="id_number" name="id_number" value="{{ search.get('id_number', '') }}">
+      </div>
+      <div class="field">
+        <label for="first_name">שם פרטי</label>
+        <input type="text" id="first_name" name="first_name" value="{{ search.get('first_name', '') }}">
+      </div>
+      <div class="field">
+        <label for="last_name">שם משפחה</label>
+        <input type="text" id="last_name" name="last_name" value="{{ search.get('last_name', '') }}">
+      </div>
+      <div class="field">
+        <label for="street">רחוב</label>
+        <input type="text" id="street" name="street" value="{{ search.get('street', '') }}">
+      </div>
+      <div class="field">
+        <label for="city">עיר</label>
+        <input type="text" id="city" name="city" value="{{ search.get('city', '') }}">
+      </div>
+      <div class="field">
+        <label for="house_number">מספר בית</label>
+        <input type="text" id="house_number" name="house_number" value="{{ search.get('house_number', '') }}">
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" name="use_soundex" {% if search.get('use_soundex', True) %}checked{% endif %}>
+          שימוש ב-Soundex לתיקון שגיאות כתיב
+        </label>
+      </div>
+      <div class="field">
+        <label for="csv_file">העלאת קובץ נתונים (CSV)</label>
+        <input type="file" id="csv_file" name="csv_file" accept=".csv" onchange="this.form.submit()">
+      </div>
+      <div class="actions">
+        <button type="submit">בצע חיפוש</button>
+        <button type="submit" name="reset_sample" value="1" class="secondary">אפס לנתוני דוגמה</button>
+      </div>
+    </form>
+
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.type }}">{{ message.text }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if results is not none %}
+      {% if results %}
+        <table>
+          <thead>
+            <tr>
+              <th>מספר זהות</th>
+              <th>שם פרטי</th>
+              <th>שם משפחה</th>
+              <th>רחוב</th>
+              <th>מספר בית</th>
+              <th>עיר</th>
+              <th>ציון <button type="button" id="score-info-btn" title="איך הציון מחושב?">?</button></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for person in results %}
+              <tr>
+                <td>{{ person.person.id_number }}</td>
+                <td>{{ person.person.first_name }}</td>
+                <td>{{ person.person.last_name }}</td>
+                <td>{{ person.person.street }}</td>
+                <td>{{ person.person.house_number }}</td>
+                <td>{{ person.person.city }}</td>
+                <td>{{ person.score|round(1) }}</td>
+              </tr>
+              <tr class="score-breakdown">
+                <td colspan="7">
+                  <strong>פירוט הניקוד:</strong>
+                  {% set field_names_he = {'first_name': 'שם פרטי', 'last_name': 'שם משפחה', 'street': 'רחוב', 'city': 'עיר', 'house_number': 'מספר בית'} %}
+                  {% for field, score in person.field_scores.items() %}
+                    {% set field_name = field_names_he.get(field, field) %}
+                    {% set explanation = '' %}
+                    {% if score == 100.0 %}
+                      {% set explanation = 'התאמה מדויקת' %}
+                    {% elif score == 85.0 %}
+                      {% set explanation = 'התאמה חלקית (מתחיל ב...)' %}
+                    {% elif score == 65.0 %}
+                      {% set explanation = 'התאמה חלקית (מכיל את...)' %}
+                    {% elif score == 90.0 %}
+                      {% set explanation = 'התאמת כינוי (למשל, אבי-אברהם)' %}
+                    {% elif score == 88.0 %}
+                      {% set explanation = 'התאמה פונטית קרובה' %}
+                    {% elif score == 80.0 %}
+                      {% set explanation = 'דמיון גבוה (תיקון שגיאות קלות)' %}
+                    {% elif score == 75.0 %}
+                      {% set explanation = 'התאמה פונטית (Soundex)' %}
+                    {% endif %}
+                    {{ field_name }}: {{ explanation }} ({{ score }}%){% if not loop.last %}; {% endif %}
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>לא נמצאו תוצאות לחיפוש הנוכחי.</p>
+      {% endif %}
+    {% endif %}
+
+    <div id="score-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>איך הציון מחושב?</h2>
+        <p>הציון הוא <strong>ממוצע משוקלל</strong> של מידת ההתאמה בכל אחד מהשדות שהזנת בחיפוש. הרעיון הוא לתת חשיבות (או "משקל") שונה לכל שדה, כי התאמה בשם משפחה, למשל, היא לרוב משמעותית יותר מהתאמה בעיר.</p>
+        
+        <h3>1. משקולות לכל שדה</h3>
+        <p>לכל שדה יש משקל קבוע המעיד על חשיבותו בחישוב:</p>
+        <ul>
+          <li><strong>שם פרטי / שם משפחה:</strong> משקל 3.0</li>
+          <li><strong>רחוב:</strong> משקל 2.0</li>
+          <li><strong>עיר / מספר בית:</strong> משקל 1.5</li>
+        </ul>
+
+        <h3>2. ציון התאמה לכל שדה</h3>
+        <p>כל שדה מקבל ציון באחוזים על סמך איכות ההתאמה:</p>
+        <ul>
+          <li><strong>התאמה מדויקת:</strong> 100%</li>
+          <li><strong>הערך ברשומה מתחיל במה שחיפשת:</strong> 85%</li>
+          <li><strong>התאמת כינוי (למשל, אבי לאברהם):</strong> 90%</li>
+          <li><strong>התאמה פונטית קרובה (החלפת אותיות דומות):</strong> 88%</li>
+          <li><strong>דמיון גבוה (לפי Levenshtein, לתיקון שגיאות הקלדה):</strong> 80%</li>
+          <li><strong>התאמה פונטית (Soundex):</strong> 75% (אם האפשרות מסומנת)</li>
+          <li><strong>הערך ברשומה מכיל את מה שחיפשת:</strong> 65%</li>
+          <li><strong>אין התאמה:</strong> 0% (אם שדה אחד לא מתאים, הרשומה כולה נפסלת)</li>
+        </ul>
+
+        <h3>3. חישוב הציון הסופי</h3>
+        <p>הציון הסופי מחושב על ידי הכפלת ציון כל שדה במשקל שלו, סיכום התוצאות, וחלוקה בסך המשקולות של השדות שהשתתפו בחיפוש.</p>
+      </div>
+    </div>
+  </body>
+</html>
