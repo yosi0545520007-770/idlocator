@@ -1,7 +1,7 @@
-﻿import unittest
+import unittest
 
 from idlocator.models import Person
-from idlocator.repository import PersonRepository
+from idlocator.repository import PersonRepository, load_sample_repository
 from idlocator.service import IdentityLocator, MatchResult
 from idlocator.soundex import compare_soundex, soundex
 
@@ -53,6 +53,15 @@ class IdentityLocatorTests(unittest.TestCase):
         match = results[0]
         self.assertEqual(match.person.id_number, "200000001")
         self.assertAlmostEqual(match.score, 100.0)
+
+
+    def test_city_search_handles_common_typo(self) -> None:
+        locator = IdentityLocator(load_sample_repository())
+        typo_city = "\u05d8\u05dc \u05d0\u05e4\u05d9\u05e3"
+        correct_city = "\u05ea\u05dc \u05d0\u05d1\u05d9\u05d1"
+        results = locator.search(city=typo_city, use_soundex=True)
+        self.assertGreater(len(results), 0)
+        self.assertTrue(any(match.person.city == correct_city for match in results))
 
 
 class SoundexTests(unittest.TestCase):

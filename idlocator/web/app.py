@@ -3,32 +3,29 @@ from __future__ import annotations
 
 import csv
 import io
+from dataclasses import asdict
 import logging
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-
-from flask import Flask, render_template, request, session
+from flask import Flask, redirect, render_template, request, session, url_for
 from jinja2.exceptions import TemplateNotFound
 
-# In a real-world scenario, you might use a more robust session management.
-# For this project, Flask's default client-side session is sufficient.
-from ..models import persons_from_dicts
+from ..models import Person, persons_from_dicts
 from ..repository import PersonRepository, load_sample_repository
-from ..service import IdentityLocator
+from ..service import IdentityLocator, MatchResult
 
 # הגדרת נתיבי בסיס
 # PROJECT_ROOT מצביע לשורש הפרויקט (C:\...\idlocator)
 WEB_APP_DIR = Path(__file__).resolve().parent
-PROJECT_ROOT = WEB_APP_DIR.parents[1]
-TEMPLATE_FOLDER_PATH = PROJECT_ROOT
+PROJECT_ROOT = WEB_APP_DIR.parents[1] # חישוב יציב של נתיב הפרויקט
 TEMPLATE_FILE = PROJECT_ROOT / "data" / "people_template.csv"
 
 # הגדרת אפליקציית Flask.
-# קבצי התבניות (HTML) נטענים מהתיקייה 'idlocator/web/templates'.
+# קובץ התבנית (index.html) נטען מהתיקייה הראשית של הפרויקט.
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__, template_folder=str(TEMPLATE_FOLDER_PATH))
+app = Flask(__name__, template_folder=str(PROJECT_ROOT))
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10MB
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Needed for session management
 
@@ -59,29 +56,23 @@ def _search(locator: IdentityLocator, params: Dict[str, Any], use_soundex: bool)
 @app.route("/", methods=["GET", "POST"])
 def index() -> str:
     messages: List[Dict[str, str]] = []
-    results: Optional[List[Any]] = None
     locator = get_locator()
 
-    search_params = {
-        "id_number": "",
-        "first_name": "",
-        "last_name": "",
-        "street": "",
-        "city": "",
-        "house_number": "",
-        "use_soundex": True,
-    }
-
     if request.method == "POST":
+        # Store search params in session to repopulate form after redirect
+        search_params = {key: request.form.get(key, "").strip() for key in ["id_number", "first_name", "last_name", "street", "city", "house_number"]}
+        search_params["use_soundex"] = request.form.get("use_soundex") is not None
+        session["search_params"] = search_params
+        
         # Handle file upload
-        if "csv_file" in request.files and request.files["csv_file"].filename:
+        if "upload" in request.form and "csv_file" in request.files and request.files["csv_file"].filename:
             file = request.files["csv_file"]
             try:
                 stream = io.StringIO(file.stream.read().decode("utf-8-sig"), newline="")
                 reader = csv.DictReader(stream)
                 # Store file content in session
                 session["people_data"] = list(reader)
-                # Re-create locator with new data
+                session.pop("search_results", None) # Clear previous results
                 locator = get_locator()
                 messages.append({"text": f"קובץ '{file.filename}' נטען בהצלחה.", "type": "success"})
             except (UnicodeDecodeError, csv.Error):
@@ -89,41 +80,48 @@ def index() -> str:
             except Exception as e:
                 logger.error(f"Error processing uploaded file: {e}")
                 messages.append({"text": "אירעה שגיאה לא צפויה בעת עיבוד הקובץ.", "type": "error"})
+            session["messages"] = messages
+            return redirect(url_for("index"))
 
         # Handle reset to sample data
         elif "reset_sample" in request.form:
             if "people_data" in session:
                 session.pop("people_data")
+            session.pop("search_results", None) # Clear previous results
             locator = get_locator()
             messages.append({"text": "נתוני הדוגמה נטענו מחדש.", "type": "success"})
+            session["messages"] = messages
+            return redirect(url_for("index"))
 
-        # Handle search
-        search_params.update({
-            "id_number": request.form.get("id_number", "").strip(),
-            "first_name": request.form.get("first_name", "").strip(),
-            "last_name": request.form.get("last_name", "").strip(),
-            "street": request.form.get("street", "").strip(),
-            "city": request.form.get("city", "").strip(),
-            "house_number": request.form.get("house_number", "").strip(),
-        })
-        use_soundex = request.form.get("use_soundex") is not None
-        search_params["use_soundex"] = use_soundex
+        # Handle search (default action if not upload or reset)
+        else:
+            if any(value for key, value in search_params.items() if key != "use_soundex"):
+                try:                    
+                    results = _search(locator, search_params, search_params["use_soundex"])
+                    # Serialize results to store in session
+                    session["search_results"] = [asdict(r) for r in results]
+                except Exception:
+                    messages.append({"text": "אירעה שגיאה לא צפויה בעת ביצוע החיפוש.", "type": "error"})
+                    session["messages"] = messages
+            return redirect(url_for("index"))
 
-        if any(value for key, value in search_params.items() if key != "use_soundex"):
-            try:
-                results = _search(locator, search_params, use_soundex)
-            except Exception:
-                messages.append({"text": "אירעה שגיאה לא צפויה בעת ביצוע החיפוש.", "type": "error"})
-
+    # On GET request, retrieve data from session
+    messages = session.pop("messages", [])
+    search_params = session.pop("search_params", {"use_soundex": True})
+    results_data = session.pop("search_results", None)
+    results = [MatchResult(person=Person.from_dict(r['person']), score=r['score'], field_scores=r['field_scores']) for r in results_data] if results_data is not None else None
+    
     try:
+        current_data = locator.repository.all()
         return render_template(
             "index.html",
             messages=messages,
             results=results,
             search=search_params,
+            current_data=current_data,
         )
     except TemplateNotFound:
-        error_msg = "שגיאה קריטית: קובץ התבנית 'index.html' לא נמצא. אנא ודא שהוא ממוקם בנתיב: 'idlocator/web/templates/index.html'"
+        error_msg = f"שגיאה קריטית: קובץ התבנית 'index.html' לא נמצא. ודא שהוא ממוקם בתיקייה הראשית של הפרויקט: {PROJECT_ROOT}"
         logger.error(error_msg)
         return f"<h1>{error_msg}</h1>", 500
 

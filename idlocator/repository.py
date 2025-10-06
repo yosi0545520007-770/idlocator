@@ -1,4 +1,4 @@
-﻿﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
+﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
 from __future__ import annotations
 
 import csv
@@ -39,6 +39,9 @@ class PersonRepository:
 
 def load_sample_repository() -> PersonRepository:
     """טעינת מאגר ברירת המחדל מהקובץ sample_people.csv."""
-    base_dir = Path(__file__).resolve().parents[1]
-    csv_path = base_dir / "data" / "sample_people_20.csv"
+    # This path logic needs to work both locally and inside the Docker container.
+    # We calculate the project root relative to this file's location.
+    repo_file_dir = Path(__file__).resolve().parent # .../idlocator/idlocator
+    project_root = repo_file_dir.parent # .../idlocator
+    csv_path = project_root / "data" / "sample_people_20.csv"
     return PersonRepository.from_csv(csv_path)

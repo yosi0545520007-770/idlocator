@@ -10,3 +10,6 @@ venv/
 # IDE / Editor specific
 .vscode/
 .idea/
+
+# Firebase
+.firebase/

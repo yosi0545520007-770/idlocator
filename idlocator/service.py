@@ -1,4 +1,4 @@
-﻿﻿"""לוגיקה עיקרית של חיפוש והתאמת זהות."""
+"""לוגיקה עיקרית של חיפוש והתאמת זהות."""
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
@@ -28,20 +28,31 @@ _FIELD_WEIGHTS = {
 _NICKNAME_MAP: Dict[str, List[str]] = {
     "אבי": ["אברהם"],
     "איציק": ["יצחק", "יחזקאל"],
-    "אלי": ["אליהו", "אליעזר"],
+    "אלי": ["אליהו", "אליעזר", "אלחנן"],
+    "אפי": ["אפרים", "אפרת"],
     "בני": ["בנימין"],
     "גבי": ["גבריאל"],
     "דודי": ["דוד"],
     "דני": ["דניאל"],
+    "חיים": ["יחיאל"],
     "יענקל'ה": ["יעקב"],
+    "יריב": ["ירמיהו"],
     "יוסי": ["יוסף"],
     "מיקי": ["מיכאל", "מיכל"],
     "מוטי": ["מרדכי"],
+    "מושיקו": ["משה"],
     "צחי": ["יצחק"],
     "רפי": ["רפאל"],
     "שוקי": ["יהושע"],
     "שי": ["ישעיהו"],
     "שמוליק": ["שמואל"],
+}
+
+_ABBREVIATION_MAP: Dict[str, List[str]] = {
+    "ת\"א": ["תל אביב"],
+    "ר\"ג": ["רמת גן"],
+    "דר": ["דרך"],
+    "י-ם": ["ירושלים"],
 }
 
 # בניית מפה דו-כיוונית לחיפוש כינויים יעיל
@@ -51,6 +62,14 @@ for nickname, full_names in _NICKNAME_MAP.items():
         if full_name not in _REVERSE_NICKNAME_MAP:
             _REVERSE_NICKNAME_MAP[full_name] = []
         _REVERSE_NICKNAME_MAP[full_name].append(nickname)
+
+# בניית מפה דו-כיוונית עבור קיצורים
+_REVERSE_ABBREVIATION_MAP: Dict[str, List[str]] = {}
+for abbr, full_names in _ABBREVIATION_MAP.items():
+    for full_name in full_names:
+        if full_name not in _REVERSE_ABBREVIATION_MAP:
+            _REVERSE_ABBREVIATION_MAP[full_name] = []
+        _REVERSE_ABBREVIATION_MAP[full_name].append(abbr)
 
 class IdentityLocator:
     """שירות חיפוש זהויות על בסיס נתונים מובנים."""
@@ -85,7 +104,9 @@ class IdentityLocator:
         #    זהו שיפור ביצועים משמעותי עבור קבצים גדולים.
         candidates = self.repository.all()
         if city and city.strip():
-            candidates = self.repository.filter_by_city(city)
+            city_matches = self.repository.filter_by_city(city)
+            if city_matches:
+                candidates = city_matches
 
         matches: List[MatchResult] = []
         for person in candidates:
@@ -200,6 +221,11 @@ def _score_text_field(query: str, value: str, use_soundex: bool) -> float:
     query_lower = query.casefold()
     value_lower = value.casefold()
 
+    # נורמליזציה של מקפים וגרשיים כדי להתאים "בן-גוריון" ל-"בן גוריון"
+    # ו-"ת"א" ל-"תא"
+    query_normalized = query_lower.replace("-", " ").replace("\"", "")
+    value_normalized = value_lower.replace("-", " ").replace("\"", "")
+
     if query_lower == value_lower:
         return 1.0
 
@@ -207,23 +233,37 @@ def _score_text_field(query: str, value: str, use_soundex: bool) -> float:
     if (query_lower in _NICKNAME_MAP and value_lower in _NICKNAME_MAP[query_lower]) or \
        (query_lower in _REVERSE_NICKNAME_MAP and value_lower in _REVERSE_NICKNAME_MAP[query_lower]):
         return 0.9
+    
+    # בדיקת קיצורים (למשל, ת"א -> תל אביב)
+    if (query_normalized in _ABBREVIATION_MAP and value_normalized in _ABBREVIATION_MAP[query_normalized]) or \
+       (query_normalized in _REVERSE_ABBREVIATION_MAP and value_normalized in _REVERSE_ABBREVIATION_MAP[query_normalized]):
+        return 0.9
 
-    if value_lower.startswith(query_lower):
+    if value_normalized.startswith(query_normalized):
         return 0.85
-    # בדיקה חדשה: התאמה פונטית "חזקה" עם ציון גבוה יותר
-    if _normalize_for_phonetic_search(query) == _normalize_for_phonetic_search(value):
-        return 0.88
 
-    # בדיקה חדשה: התאמה לפי דמיון Levenshtein (טוב לטעויות הקלדה)
-    lev_similarity = _levenshtein_similarity(query_lower, value_lower)
+    lev_similarity = _levenshtein_similarity(query_normalized, value_normalized)
     if lev_similarity >= 0.8:
         return 0.8
-
+    
     if use_soundex and compare_soundex(query, value):
         return 0.75
 
-    if query_lower in value_lower:
+    if query_normalized in value_normalized:
         return 0.65
+
+    # בדיקה חדשה: נורמליזציה פונטית אגרסיבית יותר להתאמות כמו "טל אביב" -> "תל אביב"
+    # הלוגיקה הזו מחליפה אותיות דומות ומסירה רווחים כדי להשוות את השורש הפונטי.
+    phonetic_replacements = str.maketrans({
+        'ט': 'ת', 'כ': 'ק', 'ס': 'ש', 'ב': 'פ', 'ו': 'פ', 'צ': 'ז',
+        'א': '', 'ה': '', 'י': '', ' ': ''
+    })
+    normalized_query = query_lower.translate(phonetic_replacements)
+    normalized_value = value_lower.translate(phonetic_replacements)
+
+    if normalized_query == normalized_value:
+        return 0.60  # ניתן ציון נמוך יחסית כדי שהתאמות טובות יותר יקבלו עדיפות
+
     return 0.0
 
 def _score_house_number(query: str, value: str) -> float:
@@ -238,7 +278,11 @@ def _score_house_number(query: str, value: str) -> float:
     if query_s == value_s:
         return 1.0
 
-    # התאמה חלקית (למשל, חיפוש "12" מול "12א")
+    # התאמה חלקית (למשל, חיפוש "12" מול "12א") או "12א" מול "12")
     if value_s.startswith(query_s) or query_s.startswith(value_s):
+        # אם אחד מהם מכיל רק מספרים והשני מכיל מספרים ואותיות, ניתן ציון נמוך יותר
+        if (query_s.isdigit() and not value_s.isdigit()) or \
+           (value_s.isdigit() and not query_s.isdigit()):
+            return 0.90
         return 0.95  # ציון גבוה אך לא מושלם
     return 0.0

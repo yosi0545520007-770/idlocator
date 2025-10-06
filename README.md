@@ -1,85 +1,113 @@
-ο»Ώο»Ώ# Id Locator
+?# Id Locator
 
-Χ¤Χ¨Χ•Χ™Χ§Χ Χ¤Χ™Χ™ΧªΧ•Χ ΧΆΧ‘Χ•Χ¨ ΧΧ™ΧªΧ•Χ¨ Χ–Χ”Χ•Χª Χ©Χ ΧΧ Χ©Χ™Χ ΧΧ¤Χ™ Χ›ΧªΧ•Χ‘Χª Χ•ΧΧ΅Χ¤Χ¨ ΧªΧΆΧ•Χ“Χª Χ–Χ”Χ•Χª, ΧΆΧ ΧªΧΧ™Χ›Χ” Χ‘ΧΧΧ’Χ•Χ¨Χ™ΧªΧ Soundex ΧΧªΧ™Χ§Χ•Χ Χ©Χ’Χ™ΧΧ•Χª Χ›ΧªΧ™Χ‘ Χ‘Χ©ΧΧ•Χª Χ•Χ‘Χ›ΧªΧ•Χ‘Χ•Χª.
+τψειχθ τιιϊεο ςαεψ ΰιϊεψ ζδεϊ ωμ ΰπωιν μτι λϊεαϊ εξρτψ ϊςεγϊ ζδεϊ, ςν ϊξιλδ αΰμβεψιϊν Soundex μϊιχεο ωβιΰεϊ λϊια αωξεϊ εαλϊεαεϊ.
 
-## ΧªΧ›Χ•Χ Χ•Χª ΧΆΧ™Χ§Χ¨Χ™Χ•Χª
-- ΧΧΆΧ™Χ Χ” Χ§ΧΧ” Χ©Χ Χ ΧªΧ•Χ Χ™Χ ΧΧ§Χ•Χ‘Χ¥ CSV ΧΧ• ΧΧ§Χ¨Χ™ΧΧ” Χ™Χ©Χ™Χ¨Χ” Χ‘Χ§Χ•Χ“.
-- Χ—Χ™Χ¤Χ•Χ© ΧΧ¤Χ™ ΧªΧΆΧ•Χ“Χª Χ–Χ”Χ•Χª, Χ›ΧªΧ•Χ‘Χª ΧΧ• Χ©Χ ΧΧΧ.
-- ΧΧ Χ’Χ Χ•Χ Soundex Χ¤Χ Χ™ΧΧ™ Χ©ΧΧΧ¤Χ©Χ¨ Χ”ΧªΧΧΧ•Χª Χ’ΧΧ™Χ©Χ•Χª ΧΧ©ΧΧ•Χª Χ•Χ›ΧªΧ•Χ‘Χ•Χª ΧΆΧ Χ©Χ’Χ™ΧΧ•Χª Χ›ΧªΧ™Χ‘ Χ Χ¤Χ•Χ¦Χ•Χª.
-- ΧΧΧ©Χ§ CLI Χ‘Χ΅Χ™Χ΅Χ™ ΧΧ§Χ‘ΧΧª Χ©ΧΧ™ΧΧªΧ•Χª ΧΧ”ΧΧ©ΧªΧΧ© Χ•Χ”Χ¦Χ’Χª ΧªΧ•Χ¦ΧΧ•Χª.
-- ΧΧ΅Χ UI ΧΧ‘Χ•Χ΅Χ΅ Flask ΧΧΧΆΧ™Χ Χª Χ§Χ‘Χ¦Χ™Χ Χ•ΧΧ”Χ¦Χ’Χª ΧªΧ•Χ¦ΧΧ•Χª Χ‘Χ¦Χ•Χ¨Χ” Χ’Χ¨Χ¤Χ™Χª, Χ›Χ•ΧΧ ΧΧ¤Χ©Χ¨Χ•Χª ΧΧ”Χ•Χ¨Χ™Χ“ ΧªΧ‘Χ Χ™Χª Χ¨Χ™Χ§Χ” Χ•Χ΅Χ Χ‘Χ“Χ™Χ§Χ” Χ©Χ 20 Χ¨Χ©Χ•ΧΧ•Χª Χ‘ΧΆΧ‘Χ¨Χ™Χª.
+## ϊλεπεϊ ςιχψιεϊ
+- θςιπδ χμδ ωμ πϊεπιν ξχεαυ CSV ΰε ξχψιΰδ ιωιψδ αχεγ.
+- ηιτεω μτι ϊςεγϊ ζδεϊ, λϊεαϊ ΰε ων ξμΰ.
+- ξπβπεο Soundex τπιξι ωξΰτωψ δϊΰξεϊ βξιωεϊ μωξεϊ ελϊεαεϊ ςν ωβιΰεϊ λϊια πτεφεϊ.
+- ξξωχ CLI αριρι μχαμϊ ωΰιμϊεϊ ξδξωϊξω εδφβϊ ϊεφΰεϊ.
+- ξρκ UI ξαερρ Flask μθςιπϊ χαφιν εμδφβϊ ϊεφΰεϊ αφεψδ βψτιϊ, λεμμ ΰτωψεϊ μδεψιγ ϊαπιϊ ψιχδ ερθ αγιχδ ωμ 20 ψωεξεϊ αςαψιϊ.
 
-## Χ”ΧªΧ§Χ Χ” Χ•Χ”Χ¤ΧΆΧΧ”
-1. Χ•Χ“ΧΧ• Χ©Χ™Χ© ΧΧ›Χ Python 3.10 Χ•ΧΧΆΧΧ” ΧΧ•ΧªΧ§Χ.
-2. Χ”ΧªΧ§Χ™Χ Χ• ΧΧª Χ”ΧªΧΧ•Χ™Χ•Χª Χ‘ΧΧΧ¦ΧΆΧ•Χª:
+## δϊχπδ εδτςμδ
+1. εγΰε ωιω μλν Python 3.10 εξςμδ ξεϊχο.
+2. δϊχιπε ΰϊ δϊμειεϊ αΰξφςεϊ:
    ```bash
    pip install .
    ```
-3. ΧΧ”Χ¨Χ¦Χª Χ”-CLI:
+3. μδψφϊ δ-CLI:
    ```bash
    python -m idlocator.cli --help
    ```
-4. ΧΧ”Χ¨Χ¦Χª ΧΧ΅Χ Χ”-UI:
+4. μδψφϊ ξρκ δ-UI:
    ```bash
    python -m idlocator.web.app
    ```
-   Χ”Χ©Χ¨Χª Χ™ΧΆΧΧ” Χ‘Χ›ΧªΧ•Χ‘Χª http://127.0.0.1:5000/ (Χ–Χ•Χ”Χ™ Χ‘Χ¨Χ™Χ¨Χª Χ”ΧΧ—Χ“Χ).
+   δωψϊ ιςμδ αλϊεαϊ http://127.0.0.1:5000/ (ζεδι αψιψϊ δξηγμ).
 
-   ΧΧ Χ¤Χ•Χ¨Χ 5000 ΧªΧ¤Χ•Χ΅, Χ Χ™ΧªΧ ΧΧ”Χ¨Χ™Χ¥ ΧΧª Χ”Χ©Χ¨Χª ΧΆΧ Χ¤Χ•Χ¨Χ ΧΧ—Χ¨ Χ‘ΧΧΧ¦ΧΆΧ•Χª Χ”Χ¤Χ§Χ•Χ“Χ”:
+   ΰν τεψθ 5000 ϊτερ, πιϊο μδψιυ ΰϊ δωψϊ ςμ τεψθ ΰηψ αΰξφςεϊ δτχεγδ:
    ```bash
    python -m idlocator.web.app --port 8080
    ```
-   Χ‘ΧΧ§Χ¨Χ” Χ–Χ”, Χ”ΧΧªΧ¨ Χ™Χ”Χ™Χ” Χ–ΧΧ™Χ Χ‘Χ›ΧªΧ•Χ‘Χª http://127.0.0.1:8080/.
+   αξχψδ ζδ, δΰϊψ ιδιδ ζξιο αλϊεαϊ http://127.0.0.1:8080/.
 
-   Χ‘ΧΧ΅Χ Χ”Χ¨ΧΧ©Χ™ ΧªΧΧ¦ΧΧ• Χ©Χ Χ™ Χ›Χ¤ΧªΧ•Χ¨Χ™ Χ”Χ•Χ¨Χ“Χ”:
-   - "Χ”Χ•Χ¨Χ“Χª Χ§Χ•Χ‘Χ¥ ΧªΧ‘Χ Χ™Χª Χ¨Χ™Χ§" (ΧΧΧ™ΧΧ•Χ™ Χ ΧªΧ•Χ Χ™Χ ΧΧ©ΧΧ›Χ)
-   - "Χ”Χ•Χ¨Χ“Χª Χ§Χ•Χ‘Χ¥ Χ“Χ•Χ’ΧΧ” (20 Χ¨Χ©Χ•ΧΧ•Χª Χ‘ΧΆΧ‘Χ¨Χ™Χª)"
-   Χ Χ™ΧªΧ ΧΧΧΧ ΧΧª Χ”Χ§Χ‘Χ¦Χ™Χ Χ”ΧΧΧ• Χ•ΧΧ”ΧΆΧΧ•Χª ΧΧ•ΧªΧ Χ‘Χ—Χ–Χ¨Χ” Χ“Χ¨Χ ΧΧ•Χ¤Χ΅ Χ”ΧΧΆΧ™Χ Χ”.
+   αξρκ δψΰωι ϊξφΰε ωπι λτϊεψι δεψγδ:
+   - "δεψγϊ χεαυ ϊαπιϊ ψιχ" (μξιμει πϊεπιν ξωμλν)
+   - "δεψγϊ χεαυ γεβξδ (20 ψωεξεϊ αςαψιϊ)"
+   πιϊο μξμΰ ΰϊ δχαφιν δμμε εμδςμεϊ ΰεϊν αηζψδ γψκ θετρ δθςιπδ.
 
-## Χ§Χ‘Χ¦Χ™ Χ ΧªΧ•Χ Χ™Χ ΧΧ“Χ•Χ’ΧΧ”
-- `data/sample_people.csv` β€“ Χ§Χ•Χ‘Χ¥ Χ‘Χ΅Χ™Χ΅Χ™ ΧΆΧ Χ©ΧΧ•Χ© Χ¨Χ©Χ•ΧΧ•Χª.
-- `data/sample_people_20.csv` β€“ Χ΅Χ Χ‘Χ“Χ™Χ§Χ•Χª Χ’Χ“Χ•Χ Χ™Χ•ΧªΧ¨ ΧΆΧ 20 Χ¨Χ©Χ•ΧΧ•Χª Χ‘ΧΆΧ‘Χ¨Χ™Χª ΧΧ¦Χ¨Χ›Χ™ Χ”Χ“Χ’ΧΧ” Χ•Χ‘Χ“Χ™Χ§Χ•Χª.
-- `data/people_template.csv` β€“ ΧªΧ‘Χ Χ™Χª Χ¨Χ™Χ§Χ” ΧΧΧ™ΧΧ•Χ™.
+## χαφι πϊεπιν μγεβξδ
+- `data/sample_people.csv` – χεαυ αριρι ςν ωμεω ψωεξεϊ.
+- `data/sample_people_20.csv` – ρθ αγιχεϊ βγεμ ιεϊψ ςν 20 ψωεξεϊ αςαψιϊ μφψλι δγβξδ εαγιχεϊ.
+- `data/people_template.csv` – ϊαπιϊ ψιχδ μξιμει.
 
-## Χ‘Χ“Χ™Χ§Χ•Χª
-- Χ”Χ¨Χ¦Χª Χ‘Χ“Χ™Χ§Χ•Χª Χ™Χ—Χ™Χ“Χ” (ΧΧ•Χ’Χ™Χ§Χ”):
+## αγιχεϊ
+- δψφϊ αγιχεϊ ιηιγδ (μεβιχδ):
   ```bash
   python -m unittest tests.test_service
   ```
-- Χ”Χ¨Χ¦Χª Χ‘Χ“Χ™Χ§Χ•Χª ΧΧΧ©Χ§ CLI (ΧΧ–Χ•Χ¨ UI):
+- δψφϊ αγιχεϊ ξξωχ CLI (ΰζεψ UI):
   ```bash
   python -m unittest tests.ui.test_cli_ui
   ```
 
-## ΧΧ‘Χ Χ” Χ”Χ¤Χ¨Χ•Χ™Χ§Χ
+## ξαπδ δτψειχθ
 ```
 idlocator/
-β”β”€β”€ __init__.py
-β”β”€β”€ cli.py
-β”β”€β”€ models.py
-β”β”€β”€ repository.py 
-β”β”€β”€ service.py
-β”β”€β”€ soundex.py
-β””β”€β”€ web/
-    β”β”€β”€ __init__.py
-    β”β”€β”€ app.py
-    β””β”€β”€ templates/
-        β””β”€β”€ index.html  <-- Χ§Χ•Χ‘Χ¥ Χ”-HTML Χ©Χ Χ”ΧΧªΧ¨
+??? __init__.py
+??? cli.py
+??? models.py
+??? repository.py 
+??? service.py
+??? soundex.py
+??? web/
+    ??? __init__.py
+    ??? app.py
+    ??? templates/
+        ??? index.html  <-- χεαυ δ-HTML ωμ δΰϊψ
 data/
-β”β”€β”€ people_template.csv
-β”β”€β”€ sample_people.csv
-β””β”€β”€ sample_people_20.csv
+??? people_template.csv
+??? sample_people.csv
+??? sample_people_20.csv
 tests/
-β”β”€β”€ __init__.py
-β”β”€β”€ test_service.py
-β””β”€β”€ ui/
-    β”β”€β”€ __init__.py
-    β””β”€β”€ test_cli_ui.py
+??? __init__.py
+??? test_service.py
+??? ui/
+    ??? __init__.py
+    ??? test_cli_ui.py
 pyproject.toml
 README.md
 ```
 
-## Χ¨ΧΆΧ™Χ•Χ Χ•Χª ΧΧ”Χ¨Χ—Χ‘Χ”
-- ΧΧ™Χ ΧΧ’Χ¨Χ¦Χ™Χ” ΧΧΧ΅Χ“ Χ ΧªΧ•Χ Χ™Χ ΧΧΧ™ΧªΧ™ Χ‘ΧΧ§Χ•Χ Χ§Χ•Χ‘Χ¥ CSV.
-- Χ©Χ™ΧΧ•Χ© Χ‘ΧΧΧ’Χ•Χ¨Χ™ΧªΧΧ™Χ Χ Χ•Χ΅Χ¤Χ™Χ ΧΧ”ΧªΧΧΧª ΧΧ—Χ¨Χ•Χ–Χ•Χª (Χ›Χ’Χ•Χ Levenshtein ΧΧ• fuzzywuzzy).
-- Χ©Χ™ΧΧ•Χ‘ REST API Χ‘ΧΧΧ¦ΧΆΧ•Χª FastAPI ΧΧ• Flask.
+## ψςιεπεϊ μδψηαδ
+- ΰιπθβψφιδ μξργ πϊεπιν ΰξιϊι αξχεν χεαυ CSV.
+- ωιξεω αΰμβεψιϊξιν περτιν μδϊΰξϊ ξηψεζεϊ (λβεο Levenshtein ΰε fuzzywuzzy).
+- ωιμεα REST API αΰξφςεϊ FastAPI ΰε Flask.
+
+## Deploying to Google Cloud Run
+To serve the Flask UI on the public internet you can deploy the app to Cloud Run and let Firebase Hosting proxy traffic to it.
+
+1. Install the Google Cloud SDK and authenticate:
+   ```bash
+   gcloud auth login
+   gcloud config set project idlocator-627e0
+   ```
+2. Build and push the container image using the Dockerfile in the project root:
+   ```bash
+   gcloud builds submit --tag gcr.io/idlocator-627e0/idlocator-web
+   ```
+3. Deploy the service to Cloud Run (choose the same region you will reference from Firebase, for example `us-central1`):
+   ```bash
+   gcloud run deploy idlocator-web \
+     --image gcr.io/idlocator-627e0/idlocator-web \
+     --platform managed \
+     --region us-central1 \
+     --allow-unauthenticated
+   ```
+4. After the service is live, redeploy Firebase Hosting so `firebase.json` routes all traffic to Cloud Run:
+   ```bash
+   firebase deploy --only hosting
+   ```
+5. Visit either the Cloud Run URL that is returned by step 3 or the Firebase Hosting URL (`https://idlocator-627e0.web.app`) to use the UI.
+
+

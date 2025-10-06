@@ -1,4 +1,4 @@
-﻿"""מודלים בסיסיים של היישום."""
+"""מודלים בסיסיים של היישום."""
 from __future__ import annotations
 
 from dataclasses import dataclass

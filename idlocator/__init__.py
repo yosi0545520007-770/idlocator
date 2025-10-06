@@ -1,4 +1,4 @@
-﻿"""חבילה לוגיקה לאיתור זהות בנתוני דוגמה."""
+"""חבילה לוגיקה לאיתור זהות בנתוני דוגמה."""
 
 from .service import IdentityLocator, load_default_repository
 

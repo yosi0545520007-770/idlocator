@@ -1,4 +1,4 @@
-﻿﻿﻿﻿"""בדיקות UI בסיסיות לממשק ה-CLI של הפרויקט."""
+"""בדיקות UI בסיסיות לממשק ה-CLI של הפרויקט."""
 from __future__ import annotations
 
 import os

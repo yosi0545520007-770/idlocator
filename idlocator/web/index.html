@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8">
+    <title>Id Locator</title>
+    <style>
+      body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; margin: 2rem; background: #f6f7fb; color: #222; }
+      h1 { margin-top: 0; }
+      form, .info { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+      .info { line-height: 1.6; }
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 100; /* Sit on top */
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.5); /* Black w/ opacity */
+      }
+      .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto;
+        padding: 2rem;
+        border-radius: 12px;
+        width: 90%; max-width: 600px;
+        position: relative;
+      }
+      .close-button {
+        color: #aaa;
+        position: absolute;
+        left: 1rem; top: 0.5rem;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .close-button:hover, .close-button:focus { color: black; }
+      .info h2 { margin-top: 0; font-size: 1.1rem; }
+      .info ol { padding-right: 1.2rem; }
+      .info li { margin-bottom: 0.6rem; }
+      .info a { display: inline-block; margin-top: 0.8rem; color: #005cbb; text-decoration: none; font-weight: 600; }
+      .info a + a { margin-right: 1rem; }
+      .field { margin-bottom: 1rem; }
+      label { display: block; margin-bottom: 0.3rem; font-weight: 600; }
+      input[type="text"], input[type="file"] { box-sizing: border-box; width: 100%; padding: 0.6rem 0.8rem; border: 1px solid #ccc; border-radius: 8px; }
+      button { background: #005cbb; color: #fff; border: none; padding: 0.7rem 1.2rem; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+      button.secondary { background: #666; }
+      button.tertiary { background: #e0e0e0; color: #333; }
+      .messages { margin-bottom: 1.5rem; }
+      .messages ul { margin: 0; padding: 0; }
+      .messages li { list-style: none; padding: 0.8rem 1rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 0.5rem; border-left: 5px solid #ccc; }
+      .messages .success { background: #e8f5e9; border-left-color: #4CAF50; }
+      .messages .error { background: #ffebee; border-left-color: #f44336; }
+      table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+      th, td { padding: 0.8rem 1rem; border-bottom: 1px solid #eee; text-align: right; }
+      th { background: #f0f2f7; font-weight: 600; }
+      tr:last-child td { border-bottom: none; }
+      .score-breakdown { background-color: #f9f9f9; font-size: 0.9em; color: #555; }
+      .score-breakdown td { padding-top: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #ddd; }
+      .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+      .upload-section { border-top: 1px solid #eee; margin-top: 1.5rem; padding-top: 1.5rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Id Locator – איתור זהויות</h1>
+
+    <section class="info">
+      <p>מערכת לאיתור זהויות על בסיס נתונים. הזינו את פרטי החיפוש בטופס למטה ולחצו על "בצע חיפוש".</p>
+      <button type="button" data-modal-target="#scoreModal" class="tertiary" style="margin-top: 0.5rem;">איך הציון מחושב?</button>
+      <button type="button" data-modal-target="#dataModal" class="tertiary" style="margin-top: 0.5rem;">הצג נתונים נוכחיים</button>
+      <button type="button" data-modal-target="#soundexModal" class="tertiary" style="margin-top: 0.5rem;">דוגמאות לתיקון שגיאות (Soundex)</button>
+      <button type="button" data-modal-target="#aboutModal" class="tertiary" style="margin-top: 0.5rem;">אודות המערכת</button>
+    </section>
+
+    <form method="post" enctype="multipart/form-data" autocomplete="off">
+      <h2>חיפוש מתקדם</h2>
+      <div class="field">
+        <label for="id_number">מספר תעודת זהות</label>
+        <input type="text" id="id_number" name="id_number" value="{{ search.get('id_number', '') }}">
+      </div>
+      <div class="field">
+        <label for="first_name">שם פרטי</label>
+        <input type="text" id="first_name" name="first_name" value="{{ search.get('first_name', '') }}">
+      </div>
+      <div class="field">
+        <label for="last_name">שם משפחה</label>
+        <input type="text" id="last_name" name="last_name" value="{{ search.get('last_name', '') }}">
+      </div>
+      <div class="field">
+        <label for="street">רחוב</label>
+        <input type="text" id="street" name="street" value="{{ search.get('street', '') }}">
+      </div>
+      <div class="field">
+        <label for="city">עיר</label>
+        <input type="text" id="city" name="city" value="{{ search.get('city', '') }}">
+      </div>
+      <div class="field">
+        <label for="house_number">מספר בית</label>
+        <input type="text" id="house_number" name="house_number" value="{{ search.get('house_number', '') }}">
+      </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" name="use_soundex" {% if search.get('use_soundex', True) %}checked{% endif %}>
+          שימוש ב-Soundex לתיקון שגיאות כתיב
+        </label>
+      </div>
+      <div class="actions">
+        <button type="submit">בצע חיפוש</button>
+        <button type="button" onclick="window.location.href='/'" class="tertiary">נקה טופס</button>
+      </div>
+
+      <div class="upload-section">
+        <div class="field">
+          <label for="csv_file">טעינת קובץ CSV</label>
+          <input type="file" id="csv_file" name="csv_file" accept=".csv">
+        </div>
+        <div class="actions">
+          <button type="submit" name="upload" value="1" class="secondary">טען קובץ</button>
+          <button type="submit" name="reset_sample" value="1" class="secondary">אפס לנתוני דוגמה</button>
+        </div>
+      </div>
+    </form>
+
+    {% if messages %}
+      <div class="messages">
+      <ul>
+        {% for message in messages %}
+          <li class="{{ message.type }}">{{ message.text }}</li>
+        {% endfor %}
+      </ul>
+      </div>
+    {% endif %}
+
+    {% if results is not none %}
+      {% if results %}
+        <table>
+          <thead>
+            <tr>
+              <th>מספר זהות</th>
+              <th>שם פרטי</th>
+              <th>שם משפחה</th>
+              <th>רחוב</th>
+              <th>מספר בית</th>
+              <th>עיר</th>
+              <th>ציון</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for match in results %}
+              <tr>
+                <td>{{ match.person.id_number }}</td>
+                <td>{{ match.person.first_name }}</td>
+                <td>{{ match.person.last_name }}</td>
+                <td>{{ match.person.street }}</td>
+                <td>{{ match.person.house_number }}</td>
+                <td>{{ match.person.city }}</td>
+                <td>{{ match.score|round(1) }}</td>
+              </tr>
+              <tr class="score-breakdown">
+                <td colspan="7">
+                  פירוט ניקוד:
+                  {% for field, score in match.field_scores.items() %}
+                    {{ field }}: {{ score|round(0) }}%
+                    {% if not loop.last %}|{% endif %}
+                  {% endfor %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>לא נמצאו תוצאות לחיפוש הנוכחי.</p>
+      {% endif %}
+    {% endif %}
+
+    <!-- The Modal -->
+    <div id="scoreModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>איך ציון ההתאמה מחושב?</h2>
+        <p>הציון הסופי הוא ממוצע משוקלל שמתחשב בחשיבות של כל שדה ובאיכות ההתאמה בו.</p>
+        
+        <h4>1. משקלים לכל שדה</h4>
+        <p>לא כל שדה חיפוש שווה בחשיבותו. לדוגמה, התאמה בשם משפחה חשובה יותר מהתאמה בעיר. לכן, לכל שדה יש "משקל" שונה:</p>
+        <ul>
+          <li>שם פרטי / שם משפחה: <strong>3.0</strong></li>
+          <li>רחוב: <strong>2.0</strong></li>
+          <li>עיר / מספר בית: <strong>1.5</strong></li>
+        </ul>
+
+        <h4>2. ציון לכל שדה (0% עד 100%)</h4>
+        <p>עבור כל שדה, המערכת בודקת את איכות ההתאמה לפי סדר חשיבות:</p>
+        <ol>
+          <li><strong>100%</strong> - התאמה מדויקת (למשל, "אור" מול "אור").</li>
+          <li><strong>90%</strong> - התאמת כינוי (למשל, "אבי" מול "אברהם").</li>
+          <li><strong>85%</strong> - התאמת "מתחיל ב-" (למשל, "הרצ" מול "הרצל").</li>
+          <li><strong>80%</strong> - דמיון מבני גבוה (למשל, טעות הקלדה קטנה כמו "כהן" ו-"כ הן").</li>
+          <li><strong>75%</strong> - התאמה פונטית (Soundex) (למשל, "כהן" ו-"קהן").</li>
+          <li><strong>65%</strong> - התאמה חלקית (למשל, "אביב" מול "תל אביב").</li>
+        </ol>
+        <p><strong>חשוב:</strong> אם אפילו אחד מהשדות שחיפשת מקבל ציון 0, הרשומה כולה נפסלת.</p>
+
+        <h4>3. חישוב הציון הסופי</h4>
+        <p>הציון הסופי מחושב לפי הנוסחה:</p>
+        <p><code>(סכום כל [ציון שדה * משקל שדה]) / (סכום כל המשקלים של השדות שחיפשנו)</code></p>
+        <p>התוצאה היא ציון באחוזים שמשקף גם את איכות ההתאמה וגם את חשיבות השדות שהותאמו.</p>
+      </div>
+    </div>
+
+    <!-- Data Modal -->
+    <div id="dataModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>נתונים נוכחיים בשימוש</h2>
+        <p>הרשימה הבאה מציגה את הנתונים שעליהם מתבצע החיפוש הנוכחי (סה"כ: {{ current_data|length }} רשומות).</p>
+        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+          <table style="box-shadow: none;">
+            <thead>
+              <tr>
+                <th>מספר זהות</th>
+                <th>שם פרטי</th>
+                <th>שם משפחה</th>
+                <th>רחוב</th>
+                <th>עיר</th>
+                <th>מספר בית</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for person in current_data %}
+                <tr>
+                  <td>{{ person.id_number }}</td>
+                  <td>{{ person.first_name }}</td>
+                  <td>{{ person.last_name }}</td>
+                  <td>{{ person.street }}</td>
+                  <td>{{ person.city }}</td>
+                  <td>{{ person.house_number }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Soundex Examples Modal -->
+    <div id="soundexModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>איך Soundex מתקן שגיאות כתיב?</h2>
+        <p>אלגוריתם Soundex ממיר מילים לקוד פונטי המבוסס על הצליל שלהן. זה מאפשר למצוא התאמות גם אם יש שגיאות כתיב. הגרסה שלנו מותאמת במיוחד לעברית:</p>
+        
+        <h4>דוגמאות לתיקונים נפוצים:</h4>
+        <ul>
+          <li><strong>החלפת אותיות עם צליל דומה:</strong>
+            <ul>
+              <li>חיפוש "קהן" ימצא את "<strong>כהן</strong>" (ק' ו-כ' מקבלות אותו קוד).</li>
+              <li>חיפוש "יסחק" ימצא את "<strong>יצחק</strong>" (ס' ו-צ' מקבלות אותו קוד).</li>
+            </ul>
+          </li>
+          <li><strong>התעלמות מאותיות ניקוד (אמות קריאה):</strong>
+            <ul>
+              <li>חיפוש "מושה" ימצא את "<strong>משה</strong>" (האות ו' נחשבת אם קריאה ומתעלמים ממנה).</li>
+            </ul>
+          </li>
+          <li><strong>הסרת אותיות שימוש (קידומות):</strong>
+            <ul>
+              <li>חיפוש "הכהן" ימצא את "<strong>כהן</strong>" (הקידומת 'ה' מוסרת לפני ההשוואה).</li>
+            </ul>
+          </li>
+          <li><strong>נרמול אותיות סופיות:</strong>
+            <ul>
+              <li>חיפוש "שמ" ימצא את "<strong>שם</strong>" (האות הסופית 'ם' מומרת ל-'מ').</li>
+            </ul>
+          </li>
+        </ul>
+        <p>השימוש ב-Soundex מאפשר למערכת להיות גמישה יותר ולמצוא תוצאות רלוונטיות גם כשהקלדת החיפוש אינה מדויקת.</p>
+      </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>אודות המערכת</h2>
+        <p>מערכת זו היא כלי לאיתור זהויות (Id Locator) המבוסס על חיפוש מתקדם במאגר נתונים. היא מאפשרת למצוא רשומות גם כאשר פרטי החיפוש אינם מדויקים, בזכות שימוש באלגוריתמים פונטיים וטכניקות של השוואת טקסט.</p>
+        
+        <h4>טכנולוגיות וכלים</h4>
+        <ul>
+          <li><strong>צד שרת (Backend):</strong> האפליקציה בנויה באמצעות <strong>Python</strong> וספריית <strong>Flask</strong> המשמשת להרצת שרת אינטרנט קל ומהיר.</li>
+          <li><strong>צד לקוח (Frontend):</strong> ממשק המשתמש בנוי באמצעות <strong>HTML</strong>, <strong>CSS</strong> ו-<strong>JavaScript</strong> סטנדרטיים.</li>
+          <li><strong>אלגוריתמים לחיפוש:</strong>
+            <ul>
+              <li><strong>Soundex:</strong> אלגוריתם פונטי המאפשר למצוא מילים שנשמעות דומה, גם אם יש בהן שגיאות כתיב. הגרסה במערכת הותאמה במיוחד לשפה העברית.</li>
+              <li><strong>מרחק Levenshtein:</strong> אלגוריתם המודד את הדמיון המבני בין מילים ומתקן טעויות הקלדה קטנות.</li>
+              <li><strong>מילוני עזר:</strong> המערכת משתמשת במילונים פנימיים לזיהוי כינויים (כמו "יוסי" -> "יוסף") וקיצורים נפוצים ("ת"א" -> "תל אביב").</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+        // לוגיקה לפתיחת חלון קופץ
+        document.querySelectorAll("[data-modal-target]").forEach(button => {
+          button.addEventListener("click", () => {
+            const modal = document.querySelector(button.dataset.modalTarget);
+            if (modal) modal.style.display = "block";
+          });
+        });
+
+        // לוגיקה לסגירת חלון קופץ (בלחיצה על כפתור הסגירה או על הרקע)
+        document.querySelectorAll(".modal .close-button, .modal").forEach(element => {
+          element.addEventListener("click", (event) => {
+            if (event.target === element) { // סגירה רק בלחיצה על הרקע או על כפתור הסגירה
+              element.closest(".modal").style.display = "none";
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
