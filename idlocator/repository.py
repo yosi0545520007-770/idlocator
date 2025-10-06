@@ -1,9 +1,9 @@
-﻿﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
+﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
 from __future__ import annotations
 
+import importlib.resources
 import csv
 from pathlib import Path
-import pkg_resources
 from typing import Dict, Iterable, List, Optional
 from .models import Person, persons_from_dicts
 
@@ -40,11 +40,11 @@ class PersonRepository:
 
 def load_sample_repository() -> PersonRepository:
     """טעינת מאגר ברירת המחדל מהקובץ sample_people.csv."""
-    # Use pkg_resources to safely access data files packaged with the application.
-    # This is more reliable than relative path calculations, especially in containers.
-    resource_path = "data/sample_people_20.csv"
-    if not pkg_resources.resource_exists("idlocator", resource_path):
-        raise FileNotFoundError(f"Cannot find the sample data file at: {resource_path}")
-    
-    stream = pkg_resources.resource_stream("idlocator", resource_path)
-    return PersonRepository(persons_from_dicts(csv.DictReader(stream.read().decode("utf-8-sig").splitlines())))
+    # Use importlib.resources to safely access data files packaged with the application.
+    # This is the modern, standard-library way and is more reliable than relative paths.
+    try:
+        files = importlib.resources.files("idlocator")
+        with (files / "data" / "sample_people_20.csv").open("r", encoding="utf-8-sig") as f:
+            return PersonRepository(persons_from_dicts(csv.DictReader(f)))
+    except (FileNotFoundError, ModuleNotFoundError) as e:
+        raise FileNotFoundError(f"Cannot find the sample data file: {e}") from e

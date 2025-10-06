@@ -252,17 +252,18 @@ def _score_text_field(query: str, value: str, use_soundex: bool) -> float:
     if query_normalized in value_normalized:
         return 0.65
 
-    # בדיקה חדשה: נורמליזציה פונטית אגרסיבית יותר להתאמות כמו "טל אביב" -> "תל אביב"
-    # הלוגיקה הזו מחליפה אותיות דומות ומסירה רווחים כדי להשוות את השורש הפונטי.
-    phonetic_replacements = str.maketrans({
-        'ט': 'ת', 'כ': 'ק', 'ס': 'ש', 'ב': 'פ', 'ו': 'פ', 'צ': 'ז',
-        'א': '', 'ה': '', 'י': '', ' ': ''
-    })
-    normalized_query = query_lower.translate(phonetic_replacements)
-    normalized_value = value_lower.translate(phonetic_replacements)
+    if use_soundex:
+        # בדיקה חדשה: נורמליזציה פונטית אגרסיבית יותר להתאמות כמו "טל אביב" -> "תל אביב"
+        # הלוגיקה הזו מחליפה אותיות דומות ומסירה רווחים כדי להשוות את השורש הפונטי.
+        phonetic_replacements = str.maketrans({
+            'ט': 'ת', 'כ': 'ק', 'ס': 'ש', 'ב': 'פ', 'ו': 'פ', 'צ': 'ז',
+            'א': '', 'ה': '', 'י': '', ' ': ''
+        })
+        phonetic_query = query_lower.translate(phonetic_replacements)
+        phonetic_value = value_lower.translate(phonetic_replacements)
 
-    if normalized_query == normalized_value:
-        return 0.60  # ניתן ציון נמוך יחסית כדי שהתאמות טובות יותר יקבלו עדיפות
+        if phonetic_query and phonetic_value and phonetic_query == phonetic_value:
+            return 0.60
 
     return 0.0
 
