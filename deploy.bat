@@ -11,6 +11,10 @@ call :colorEcho 92 "Success:"
 call :colorEcho 93 "Warning:"
 call :colorEcho 96 "Info:"
 
+set "PROJECT_ID=idlocator-627e0"
+set "SERVICE_NAME=idlocator-web"
+set "REGION=us-central1"
+
 REM בדיקה שאנחנו בתוך ריפוזיטורי של Git
 git rev-parse --is-inside-work-tree >nul 2>&1
 if %errorlevel% neq 0 (
@@ -48,9 +52,28 @@ if %errorlevel% neq 0 ( call :colorEcho 91 "Error: 'git push' failed." & goto :e
 
 echo.
 call :colorEcho 92 "Successfully pushed to GitHub."
+
 echo.
-call :colorEcho 96 "Step 2: Deploying to Firebase..."
-echo ===================================
+call :colorEcho 96 "Step 2: Building and pushing container to Google Cloud Registry..."
+echo =================================================================
+gcloud builds submit --tag "gcr.io/%PROJECT_ID%/%SERVICE_NAME%"
+if %errorlevel% neq 0 ( call :colorEcho 91 "Error: 'gcloud builds submit' failed." & goto :eof )
+
+echo.
+call :colorEcho 92 "Container built and pushed successfully."
+
+echo.
+call :colorEcho 96 "Step 3: Deploying new container to Google Cloud Run..."
+echo =========================================================
+gcloud run deploy %SERVICE_NAME% --image "gcr.io/%PROJECT_ID%/%SERVICE_NAME%" --platform managed --region "%REGION%" --allow-unauthenticated
+if %errorlevel% neq 0 ( call :colorEcho 91 "Error: 'gcloud run deploy' failed." & goto :eof )
+
+echo.
+call :colorEcho 92 "Service deployed to Cloud Run successfully."
+
+echo.
+call :colorEcho 96 "Step 4: Deploying to Firebase Hosting..."
+echo ========================================
 firebase deploy --only hosting
 if %errorlevel% neq 0 ( call :colorEcho 91 "Error: 'firebase deploy' failed." & goto :eof )
 
