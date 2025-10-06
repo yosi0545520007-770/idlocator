@@ -1,8 +1,9 @@
-﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
+﻿﻿"""שכבת גישה לנתונים עבור רשומות אנשים."""
 from __future__ import annotations
 
 import csv
 from pathlib import Path
+import pkg_resources
 from typing import Dict, Iterable, List, Optional
 from .models import Person, persons_from_dicts
 
@@ -39,9 +40,11 @@ class PersonRepository:
 
 def load_sample_repository() -> PersonRepository:
     """טעינת מאגר ברירת המחדל מהקובץ sample_people.csv."""
-    # This path logic needs to work both locally and inside the Docker container.
-    # We calculate the project root relative to this file's location.
-    repo_file_dir = Path(__file__).resolve().parent # .../idlocator/idlocator
-    project_root = repo_file_dir.parent # .../idlocator
-    csv_path = project_root / "data" / "sample_people_20.csv"
-    return PersonRepository.from_csv(csv_path)
+    # Use pkg_resources to safely access data files packaged with the application.
+    # This is more reliable than relative path calculations, especially in containers.
+    resource_path = "data/sample_people_20.csv"
+    if not pkg_resources.resource_exists("idlocator", resource_path):
+        raise FileNotFoundError(f"Cannot find the sample data file at: {resource_path}")
+    
+    stream = pkg_resources.resource_stream("idlocator", resource_path)
+    return PersonRepository(persons_from_dicts(csv.DictReader(stream.read().decode("utf-8-sig").splitlines())))
