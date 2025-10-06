@@ -2,12 +2,16 @@
 <html lang="he" dir="rtl">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Id Locator</title>
     <style>
       body { font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif; margin: 2rem; background: #f6f7fb; color: #222; }
       h1 { margin-top: 0; }
       form, .info { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
       .info { line-height: 1.6; }
+      .dataset-info { margin-top: 0.6rem; font-weight: 600; color: #333; }
+      .responsive-table { overflow-x: auto; border-radius: 12px; }
+      .responsive-table table { min-width: 600px; }
       .modal {
         display: none; /* Hidden by default */
         position: fixed; /* Stay in place */
@@ -19,11 +23,14 @@
       }
       .modal-content {
         background-color: #fefefe;
-        margin: 10% auto;
+        margin: 8% auto;
         padding: 2rem;
         border-radius: 12px;
         width: 90%; max-width: 600px;
         position: relative;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-sizing: border-box;
       }
       .close-button {
         color: #aaa;
@@ -58,6 +65,16 @@
       .score-breakdown td { padding-top: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #ddd; }
       .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
       .upload-section { border-top: 1px solid #eee; margin-top: 1.5rem; padding-top: 1.5rem; }
+      @media (max-width: 768px) {
+        body { margin: 1rem; }
+        h1 { font-size: 1.6rem; text-align: center; }
+        form, .info { padding: 1rem; }
+        .actions { flex-direction: column; gap: 0.75rem; }
+        button { width: 100%; }
+        .field input[type="text"], .field input[type="file"] { padding: 0.55rem 0.75rem; font-size: 1rem; }
+        table { font-size: 0.95rem; }
+        .modal-content { margin: 6% auto; width: 92%; padding: 1.1rem; max-height: 88vh; }
+      }
     </style>
   </head>
   <body>
@@ -65,6 +82,11 @@
 
     <section class="info">
       <p>מערכת לאיתור זהויות על בסיס נתונים. הזינו את פרטי החיפוש בטופס למטה ולחצו על "בצע חיפוש".</p>
+      {% if using_uploaded %}
+        <p class="dataset-info">הנתונים בטבלה מבוססים על הקובץ שהעלית.</p>
+      {% else %}
+        <p class="dataset-info">הנתונים בטבלה הם מקובץ הדוגמה המצורף.</p>
+      {% endif %}
       <button type="button" data-modal-target="#scoreModal" class="tertiary" style="margin-top: 0.5rem;">איך הציון מחושב?</button>
       <button type="button" data-modal-target="#dataModal" class="tertiary" style="margin-top: 0.5rem;">הצג נתונים נוכחיים</button>
       <button type="button" data-modal-target="#soundexModal" class="tertiary" style="margin-top: 0.5rem;">דוגמאות לתיקון שגיאות (Soundex)</button>
@@ -72,6 +94,7 @@
     </section>
 
     <form method="post" enctype="multipart/form-data" autocomplete="off">
+      <input type="hidden" name="people_data_payload" value="{{ people_data_payload }}">
       <h2>חיפוש מתקדם</h2>
       <div class="field">
         <label for="id_number">מספר תעודת זהות</label>
@@ -132,7 +155,8 @@
 
     {% if results is not none %}
       {% if results %}
-        <table>
+        <div class="responsive-table">
+          <table>
           <thead>
             <tr>
               <th>מספר זהות</th>
@@ -166,9 +190,9 @@
               </tr>
             {% endfor %}
           </tbody>
-        </table>
+          </table>
+        </div>
       {% else %}
-        <p>לא נמצאו תוצאות לחיפוש הנוכחי.</p>
       {% endif %}
     {% endif %}
 
@@ -212,7 +236,7 @@
         <span class="close-button">&times;</span>
         <h2>נתונים נוכחיים בשימוש</h2>
         <p>הרשימה הבאה מציגה את הנתונים שעליהם מתבצע החיפוש הנוכחי (סה"כ: {{ current_data|length }} רשומות).</p>
-        <div style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
+        <div class="responsive-table" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px;">
           <table style="box-shadow: none;">
             <thead>
               <tr>
