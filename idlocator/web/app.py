@@ -104,12 +104,15 @@ def index() -> str:
         # Handle search (default action if not upload or reset)
         else:
             if any(value for key, value in search_params.items() if key != "use_soundex"):
-                try:                    
+                try:
                     results = _search(locator, search_params, search_params["use_soundex"])
                     # Serialize results to store in session
                     session["search_results"] = [asdict(r) for r in results]
+                    if not results:
+                        messages.append({"text": "לא נמצאו תוצאות עבור פרטי החיפוש שסיפקת.", "type": "info"})
                 except Exception:
-                    messages.append({"text": "אירעה שגיאה לא צפויה בעת ביצוע החיפוש.", "type": "error"})
+                    messages.append({"text": "אירעה שגיאה בעת ניסיון לבצע את החיפוש. נסה שוב מאוחר יותר.", "type": "error"})
+                if messages:
                     session["messages"] = messages
             return redirect(url_for("index"))
 

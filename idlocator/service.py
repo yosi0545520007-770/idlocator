@@ -242,12 +242,13 @@ def _score_text_field(query: str, value: str, use_soundex: bool) -> float:
     if value_normalized.startswith(query_normalized):
         return 0.85
 
-    lev_similarity = _levenshtein_similarity(query_normalized, value_normalized)
-    if lev_similarity >= 0.8:
-        return 0.8
-    
-    if use_soundex and compare_soundex(query, value):
-        return 0.75
+    if use_soundex:
+        lev_similarity = _levenshtein_similarity(query_normalized, value_normalized)
+        if lev_similarity >= 0.8:
+            return 0.8
+
+        if compare_soundex(query, value):
+            return 0.75
 
     if query_normalized in value_normalized:
         return 0.65
