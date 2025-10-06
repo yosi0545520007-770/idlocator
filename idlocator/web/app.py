@@ -25,7 +25,7 @@ TEMPLATE_FILE = PROJECT_ROOT / "data" / "people_template.csv"
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = Flask(__name__, template_folder=str(PROJECT_ROOT))
+app = Flask(__name__, template_folder=str(WEB_APP_DIR))
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10MB
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'  # Needed for session management
 
@@ -56,6 +56,13 @@ def _search(locator: IdentityLocator, params: Dict[str, Any], use_soundex: bool)
 @app.route("/", methods=["GET", "POST"])
 def index() -> str:
     messages: List[Dict[str, str]] = []
+
+    # Handle clear session request from "Clear Form" button
+    if "clear" in request.args:
+        session.pop("search_params", None)
+        session.pop("search_results", None)
+        return redirect(url_for("index"))
+
     locator = get_locator()
 
     if request.method == "POST":
@@ -106,10 +113,10 @@ def index() -> str:
             return redirect(url_for("index"))
 
     # On GET request, retrieve data from session
-    messages = session.pop("messages", [])
-    search_params = session.pop("search_params", {"use_soundex": True})
-    results_data = session.pop("search_results", None)
-    results = [MatchResult(person=Person.from_dict(r['person']), score=r['score'], field_scores=r['field_scores']) for r in results_data] if results_data is not None else None
+    messages = session.pop("messages", [])  # Messages should only be shown once
+    search_params = session.get("search_params", {"use_soundex": True})
+    results_data = session.get("search_results")
+    results = [MatchResult(person=Person.from_dict(r['person']), score=r['score'], field_scores=r['field_scores']) for r in results_data] if results_data else None
     
     try:
         current_data = locator.repository.all()
@@ -121,7 +128,7 @@ def index() -> str:
             current_data=current_data,
         )
     except TemplateNotFound:
-        error_msg = f"שגיאה קריטית: קובץ התבנית 'index.html' לא נמצא. ודא שהוא ממוקם בתיקייה הראשית של הפרויקט: {PROJECT_ROOT}"
+        error_msg = f"שגיאה קריטית: קובץ התבנית 'index.html' לא נמצא. ודא שהוא ממוקם בתיקייה: {app.template_folder}"
         logger.error(error_msg)
         return f"<h1>{error_msg}</h1>", 500
 
