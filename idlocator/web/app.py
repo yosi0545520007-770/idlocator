@@ -78,7 +78,8 @@ def index() -> str:
                 stream = io.StringIO(file.stream.read().decode("utf-8-sig"), newline="")
                 reader = csv.DictReader(stream)
                 # Store file content in session
-                session["people_data"] = list(reader)
+                # Convert OrderedDicts to regular dicts to ensure JSON serialization
+                session["people_data"] = [dict(row) for row in reader]
                 session.pop("search_results", None) # Clear previous results
                 locator = get_locator()
                 messages.append({"text": f"קובץ '{file.filename}' נטען בהצלחה.", "type": "success"})
